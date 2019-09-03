@@ -1,0 +1,13 @@
+CREATE TABLE tokens (id SERIAL PRIMARY KEY, token VARCHAR NOT NULL);
+CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR NOT NULL);
+CREATE TABLE profiles (id SERIAL PRIMARY KEY, name VARCHAR NOT NULL, user INTEGER REFERENCES users(id));
+
+CREATE TABLE classifications (id SERIAL PRIMARY KEY, name VARCHAR NOT NULL);
+
+CREATE TABLE words (id SERIAL PRIMARY KEY, profile INTEGER REFERENCES profiles(id), token INTEGER REFERENCES tokens(id), note VARCHAR);
+CREATE TABLE definitions (id SERIAL PRIMARY KEY, definition VARCHAR NOT NULL, word INTEGER REFERENCES words(id), classification INTEGER REFERENCES classification(id));
+
+CREATE TABLE phrases (id SERIAL PRIMARY KEY, profile INTEGER REFERENCES profiles(id), token INTEGER REFERENCES tokens(id), note VARCHAR);
+CREATE TABLE meanings (id SERIAL PRIMARY KEY, meaning VARCHAR NOT NULL, phrase INTEGER REFERENCES phrases(id));
+
+CREATE TABLE phrase_meanings (id SERIAL PRIMARY KEY, phrase INTEGER REFERENCES phrases(id), word INTEGER REFERENCES words(id));
