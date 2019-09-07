@@ -1,5 +1,5 @@
 package models
 
-type User struct {
+type Identity struct {
 	ID int64
 }

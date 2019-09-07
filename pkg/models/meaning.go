@@ -2,6 +2,6 @@ package models
 
 type Meaning struct {
 	ID      int64
-	Phrase  Phrase
+	Phrase  *Phrase
 	Meaning string
 }
