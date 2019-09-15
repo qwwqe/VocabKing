@@ -1,17 +1,25 @@
 package main
 
 import (
+	"crypto/rand"
 	"flag"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/qwwqe/VocabKing/pkg/errors"
 	"github.com/qwwqe/VocabKing/pkg/requests"
 )
+
+type claims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
 
 const (
 	HeaderClientName    = "X-Client-Name"
@@ -22,8 +30,8 @@ const (
 var (
 	version = "unset"
 
-	isDebugMode = flag.Bool("debug", false, "run in debug mode")
-	disableCORS = flag.Bool("disable-cors", false, "disable CORS enforcement")
+	jwtSigningKey = flag.String("jwt-signing-key", "", "JWT signing key")
+	isDebugMode   = flag.Bool("debug", false, "run in debug mode")
 )
 
 func main() {
@@ -35,6 +43,17 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	if *jwtSigningKey == "" {
+		if !*isDebugMode {
+			log.Fatal("JWT signing key was not provided. Exiting.")
+		}
+
+		log.Println("JWT signing key is empty. Generating random key.")
+		key := make([]byte, 64)
+		rand.Read(key)
+		*jwtSigningKey = string(key)
+	}
+
 	r := gin.Default()
 
 	r.Use(
@@ -42,7 +61,7 @@ func main() {
 		enforceContentTypeMiddleware(gin.MIMEJSON),
 	)
 
-	if *isDebugMode || *disableCORS {
+	if *isDebugMode {
 		r.Use(cors.Default())
 	} else {
 		r.Use(cors.New(cors.Config{
@@ -53,26 +72,51 @@ func main() {
 		}))
 	}
 
-	r.POST("/login", func(c *gin.Context) {
+	auth := r.Group("/auth")
+
+	auth.POST("/login", func(c *gin.Context) {
 		const op errors.Op = "login"
 
-		f := &requests.LoginForm{}
-		err := errors.NilOrNew(op, errors.KindBadForm, c.ShouldBindJSON(f), errors.Meta{
+		meta := errors.Meta{
 			HeaderServerVersion: version,
 			HeaderClientName:    c.Request.Header.Get(HeaderClientName),
 			HeaderClientVersion: c.Request.Header.Get(HeaderClientVersion),
-		})
+		}
 
-		if err != nil {
-			// TODO(dario) add logger
+		f := &requests.LoginForm{}
+
+		if err := c.ShouldBindJSON(f); err != nil {
+			err := errors.NilOrNew(op, errors.KindBadForm, err, meta)
 			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 			return
 		}
 
-		c.JSON(http.StatusOK, requests.NewLoginResponse(
-			time.Now().Add(time.Hour).UnixNano(),
-			f.Data.Username,
-		))
+		// TODO(dario) implement authentication
+
+		expireAt := time.Now().Add(5 * time.Minute).Unix()
+
+		claim := &claims{
+			Username: f.Data.Username,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expireAt,
+			},
+		}
+
+		t, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claim).
+			SignedString([]byte(*jwtSigningKey))
+
+		if err != nil {
+			err := errors.New(op, errors.KindInternalError, err, meta)
+			c.JSON(err.Kind().StatusCode(), err)
+			return
+		}
+
+		c.JSON(http.StatusOK, requests.NewLoginResponse(expireAt, t))
+	})
+
+	auth.POST("/refresh", func(c *gin.Context) {
+		// TODO(dario) implement token refresh endpoint
+		c.Status(http.StatusOK)
 	})
 
 	api := r.Group("/api")
@@ -140,24 +184,49 @@ func versionMiddleware(version string) gin.HandlerFunc {
 func authorizationMiddleware(c *gin.Context) {
 	const op errors.Op = "middleware.authorization"
 
+	meta := errors.Meta{
+		HeaderServerVersion: version,
+		HeaderClientName:    c.Request.Header.Get(HeaderClientName),
+		HeaderClientVersion: c.Request.Header.Get(HeaderClientVersion),
+	}
+
 	if isPreflightRequest(c) {
 		c.Next()
 		return
 	}
 
-	if _, ok := getAuthorizationBearerToken(c); ok {
-		// TODO(dario) implement authorization
+	if t, ok := getAuthorizationBearerToken(c); ok {
+		claim := &claims{}
+		t, err := jwt.ParseWithClaims(t, claim, func(_ *jwt.Token) (interface{}, error) {
+			return []byte(*jwtSigningKey), nil
+		})
+
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				err := errors.New(op, errors.KindInvalidToken, err, meta)
+				c.JSON(err.Kind().StatusCode(), err)
+				c.Abort()
+				return
+			}
+
+			err := errors.New(op, errors.KindBadRequest, err, meta)
+			c.JSON(err.Kind().StatusCode(), err)
+			c.Abort()
+			return
+		}
+
+		if !t.Valid {
+			err := errors.New(op, errors.KindInvalidToken, nil, meta)
+			c.JSON(err.Kind().StatusCode(), err)
+			c.Abort()
+			return
+		}
+
 		c.Next()
 		return
 	}
 
-	err := errors.NewFromString(
-		op,
-		errors.KindBadRequest,
-		"Authorization header is missing",
-		nil,
-	)
-
+	err := errors.NewFromString(op, errors.KindBadRequest, "authorization header is missing", meta)
 	c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 	c.Abort()
 }

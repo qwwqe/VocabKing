@@ -14,26 +14,32 @@ type Meta map[string]string
 
 const (
 	KindUnknown Kind = iota
-	KindDatabaseFailure
-	KindUnauthorized
-	KindBadRequest
 	KindBadForm
+	KindBadRequest
+	KindDatabaseFailure
+	KindInternalError
+	KindInvalidToken
+	KindUnauthorized
 )
 
 var kindName = map[Kind]string{
-	KindUnknown:         "unknown",
-	KindDatabaseFailure: "database failure",
-	KindUnauthorized:    "unauthorized",
-	KindBadRequest:      "bad request",
 	KindBadForm:         "bad form",
+	KindBadRequest:      "bad request",
+	KindDatabaseFailure: "database failure",
+	KindInternalError:   "internal error",
+	KindInvalidToken:    "invalid token",
+	KindUnauthorized:    "unauthorized",
+	KindUnknown:         "unknown",
 }
 
 var kindStatusCode = map[Kind]int{
-	KindUnknown:         http.StatusInternalServerError,
-	KindDatabaseFailure: http.StatusInternalServerError,
-	KindUnauthorized:    http.StatusUnauthorized,
-	KindBadRequest:      http.StatusBadRequest,
 	KindBadForm:         http.StatusBadRequest,
+	KindBadRequest:      http.StatusBadRequest,
+	KindDatabaseFailure: http.StatusInternalServerError,
+	KindInternalError:   http.StatusInternalServerError,
+	KindInvalidToken:    http.StatusUnauthorized,
+	KindUnauthorized:    http.StatusUnauthorized,
+	KindUnknown:         http.StatusInternalServerError,
 }
 
 type opErr struct {
