@@ -57,22 +57,22 @@ func main() {
 		const op errors.Op = "login"
 
 		f := &requests.LoginForm{}
-		err := errors.NilOrNew(op, errors.KindBadForm, c.ShouldBindJSON(f))
-
-		err.Meta().Set(HeaderServerVersion, version)
-		err.Meta().Set(HeaderClientName, c.Request.Header.Get(HeaderClientName))
-		err.Meta().Set(HeaderClientVersion, c.Request.Header.Get(HeaderClientVersion))
+		err := errors.NilOrNew(op, errors.KindBadForm, c.ShouldBindJSON(f), errors.Meta{
+			HeaderServerVersion: version,
+			HeaderClientName:    c.Request.Header.Get(HeaderClientName),
+			HeaderClientVersion: c.Request.Header.Get(HeaderClientVersion),
+		})
 
 		if err != nil {
 			// TODO(dario) add logger
-			c.JSON(err.Kind().StatusCode(), err)
+			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 			return
 		}
 
-		c.JSON(http.StatusOK, requests.LoginResponse{
-			Expiry: time.Now().Add(time.Hour).UnixNano(),
-			Token:  f.Username,
-		})
+		c.JSON(http.StatusOK, requests.NewLoginResponse(
+			time.Now().Add(time.Hour).UnixNano(),
+			f.Data.Username,
+		))
 	})
 
 	api := r.Group("/api")
@@ -117,8 +117,9 @@ func enforceContentTypeMiddleware(c *gin.Context) {
 			op,
 			errors.KindBadRequest,
 			"Accept header must be set to "+gin.MIMEJSON,
+			nil,
 		)
-		c.JSON(err.Kind().StatusCode(), err)
+		c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 		c.Abort()
 		return
 	}
@@ -151,8 +152,9 @@ func authorizationMiddleware(c *gin.Context) {
 		op,
 		errors.KindBadRequest,
 		"Authorization header is missing",
+		nil,
 	)
 
-	c.JSON(err.Kind().StatusCode(), err)
+	c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 	c.Abort()
 }
