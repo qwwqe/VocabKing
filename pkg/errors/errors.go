@@ -73,22 +73,22 @@ func (k Kind) StatusCode() int {
 	return kindStatusCode[k]
 }
 
-func New(o Op, k Kind, e error) *opErr {
+func New(o Op, k Kind, e error, m Meta) *opErr {
 	return &opErr{
 		op:   o,
 		kind: k,
 		err:  e,
-		meta: make(Meta),
+		meta: m,
 	}
 }
 
-func NewFromString(o Op, k Kind, msg string) *opErr {
-	return New(o, k, errors.New(msg))
+func NewFromString(o Op, k Kind, msg string, m Meta) *opErr {
+	return New(o, k, errors.New(msg), m)
 }
 
-func NilOrNew(o Op, k Kind, err error) *opErr {
+func NilOrNew(o Op, k Kind, err error, m Meta) *opErr {
 	if err != nil {
-		return New(o, k, err)
+		return New(o, k, err, m)
 	}
 	return nil
 }
