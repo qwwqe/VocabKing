@@ -81,10 +81,10 @@ this endpoint.
 }
 ```
 
-| Key        | Description      |
-|------------|------------------|
-| `username` | Account username |
-| `password` | Account password |
+| Key        | Type   | Description      |
+|------------|--------|------------------|
+| `username` | String | Account username |
+| `password` | String | Account password |
 
 **Response data:**
 
@@ -98,10 +98,10 @@ this endpoint.
 }
 ```
 
-| Key      | Description                  |
-|----------|------------------------------|
-| `expiry` | Token expiry in milliseconds |
-| `token`  | Authentication token         |
+| Key      | Type   | Description                  |
+|----------|--------|------------------------------|
+| `expiry` | Number | Token expiry in milliseconds |
+| `token`  | String | Authentication token         |
 
 ### POST `/auth/refresh`
 
@@ -124,9 +124,9 @@ HTTP Bad Request will be returned otherwise.
 }
 ```
 
-| Key     | Description                          |
-|---------|--------------------------------------|
-| `token` | Authentication token to be refreshed |
+| Key     | Type   | Description                          |
+|---------|--------|--------------------------------------|
+| `token` | String | Authentication token to be refreshed |
 
 **Response data:**
 
@@ -140,10 +140,10 @@ HTTP Bad Request will be returned otherwise.
 }
 ```
 
-| Key      | Description                  |
-|----------|------------------------------|
-| `expiry` | Token expiry in milliseconds |
-| `token`  | Authentication token         |
+| Key      | Type   | Description                  |
+|----------|--------|------------------------------|
+| `expiry` | Number | Token expiry in milliseconds |
+| `token`  | String | Authentication token         |
 
 ### POST `/api/picture`
 
