@@ -39,7 +39,7 @@ func main() {
 
 	r.Use(
 		versionMiddleware(version),
-		enforceContentTypeMiddleware,
+		enforceContentTypeMiddleware(gin.MIMEJSON),
 	)
 
 	if *isDebugMode || *disableCORS {
@@ -108,23 +108,26 @@ func getAuthorizationBearerToken(c *gin.Context) (string, bool) {
 	return f[1], true
 }
 
-func enforceContentTypeMiddleware(c *gin.Context) {
-	const op errors.Op = "middleware.enforce-content-type"
+func enforceContentTypeMiddleware(t string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		const op errors.Op = "middleware.enforce-content-type"
 
-	// TODO(dario) this should probably be more lenient
-	if c.Request.Header.Get("Accept") != gin.MIMEJSON {
-		err := errors.NewFromString(
-			op,
-			errors.KindBadRequest,
-			"Accept header must be set to "+gin.MIMEJSON,
-			nil,
-		)
-		c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
-		c.Abort()
-		return
+		// TODO(dario) this should probably be more lenient
+		if c.Request.Header.Get("Accept") != t {
+			err := errors.NewFromString(
+				op,
+				errors.KindBadRequest,
+				"Accept header must be set to "+t,
+				nil,
+			)
+			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
+			c.Abort()
+			return
+		}
+
+		c.Header("Content-Type", t)
+		c.Next()
 	}
-	c.Header("Content-Type", gin.MIMEJSON)
-	c.Next()
 }
 
 func versionMiddleware(version string) gin.HandlerFunc {
