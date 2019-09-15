@@ -107,7 +107,7 @@ func main() {
 
 		if err != nil {
 			err := errors.New(op, errors.KindInternalError, err, meta)
-			c.JSON(err.Kind().StatusCode(), err)
+			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 			return
 		}
 
@@ -204,20 +204,20 @@ func authorizationMiddleware(c *gin.Context) {
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
 				err := errors.New(op, errors.KindInvalidToken, err, meta)
-				c.JSON(err.Kind().StatusCode(), err)
+				c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 				c.Abort()
 				return
 			}
 
 			err := errors.New(op, errors.KindBadRequest, err, meta)
-			c.JSON(err.Kind().StatusCode(), err)
+			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 			c.Abort()
 			return
 		}
 
 		if !t.Valid {
 			err := errors.New(op, errors.KindInvalidToken, nil, meta)
-			c.JSON(err.Kind().StatusCode(), err)
+			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
 			c.Abort()
 			return
 		}
