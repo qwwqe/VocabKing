@@ -64,6 +64,13 @@ type StatsResponse struct {
 	Data   StatsResponseData `json:"data"`
 }
 
+func NewStatsResponse() StatsResponse {
+	return StatsResponse{
+		Result: ResultOK,
+		Data:   StatsResponseData{},
+	}
+}
+
 type SaveWordForm struct {
 	Data struct{} `json:"data" binding:"required"`
 }
