@@ -146,7 +146,7 @@ func isPreflightRequest(c *gin.Context) bool {
 
 func getAuthorizationBearerToken(c *gin.Context) (string, bool) {
 	f := strings.Fields(c.Request.Header.Get("Authorization"))
-	if len(f) != 2 || f[0] != "bearer" {
+	if len(f) != 2 || f[0] != "Bearer" {
 		return "", false
 	}
 	return f[1], true
