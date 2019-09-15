@@ -75,8 +75,8 @@ this endpoint.
 ``` json
 {
   "data": {
-    "username": "username",
-    "password": "password"
+    "username": "vocabking_0723",
+    "password": "V0C4BK1NGKN0W5M4NYW0RD54NDH45M4NYFR1END5"
   }
 }
 ```
