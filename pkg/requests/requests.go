@@ -1,16 +1,54 @@
 package requests
 
-type Action string
-
 const (
-	ActionAddWord    Action = "add_word"
-	ActionAddPicture Action = "add_picture"
+	ResultOK    = "ok"
+	ResultError = "error"
 )
 
-type StatsForm struct {
+type ErrorResponse struct {
+	Result string `json:"result"`
+	Data   error  `json:"data"`
 }
 
-type StatsResponse struct {
+func NewErrorResponse(err error) ErrorResponse {
+	return ErrorResponse{
+		Result: ResultError,
+		Data:   err,
+	}
+}
+
+type LoginForm struct {
+	Data struct {
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	} `json:"data" binding:"required"`
+}
+
+type LoginResponseData struct {
+	Expiry int64  `json:"expiry"`
+	Token  string `json:"token"`
+}
+
+type LoginResponse struct {
+	Result string            `json:"result"`
+	Data   LoginResponseData `json:"data" binding:"required"`
+}
+
+func NewLoginResponse(expiry int64, token string) LoginResponse {
+	return LoginResponse{
+		Result: ResultOK,
+		Data: LoginResponseData{
+			Expiry: expiry,
+			Token:  token,
+		},
+	}
+}
+
+type StatsForm struct {
+	Data struct{} `json:"data" binding:"required"`
+}
+
+type StatsResponseData struct {
 	NumWords          int64    `json:"num_words"`
 	NumDefinitions    int64    `json:"num_definitions"`
 	NumUndefinedWords int64    `json:"num_undefined_words"`
@@ -21,35 +59,31 @@ type StatsResponse struct {
 	UntaggedWords     []string `json:"untagged_words"`
 }
 
-type AddWordForm struct {
-	Action Action `json:"action"`
-	Data   struct {
-		Word          string   `json:"word"`
-		Pronunciation string   `json:"pronunciation"`
-		Definition    string   `json:"definition"`
-		Tags          []string `json:"tags"`
-		Note          string   `json:"note"`
-	} `json:"data"`
+type StatsResponse struct {
+	Result string            `json:"result"`
+	Data   StatsResponseData `json:"data"`
 }
 
-type AddWordResponse struct {
-	Success Status `json:"success"`
-	Data    struct {
-		DefinitionID int64 `json:"definition_id"`
-	} `json:"data"`
+type SaveWordForm struct {
+	Data struct{} `json:"data" binding:"required"`
 }
 
-type AddPictureForm struct {
-	Action Action `json:"action"`
-	Data   struct {
-		DefinitionID int64  `json:"definition_id"`
-		Picture      []byte `json:"picture"`
-	} `json:"data"`
+type SaveWordResponseData struct {
 }
 
-type AddPictureResponse struct {
-	Success Status `json:"success"`
-	Data    struct {
-		PictureID int64 `json:"definition_id"`
-	} `json:"data"`
+type SaveWordResponse struct {
+	Result string               `json:"result"`
+	Data   SaveWordResponseData `json:"data"`
+}
+
+type SavePictureForm struct {
+	Data struct{} `json:"data" binding:"required"`
+}
+
+type SavePictureResponseData struct {
+}
+
+type SavePictureResponse struct {
+	Result string                  `json:"result"`
+	Data   SavePictureResponseData `json:"data"`
 }
