@@ -27,11 +27,16 @@ const (
 	HeaderServerVersion = "X-Server-Version"
 )
 
+const (
+	DefaultJWTExpiry = 10
+)
+
 var (
 	version = "unset"
 
-	jwtSigningKey = flag.String("jwt-signing-key", "", "JWT signing key")
 	isDebugMode   = flag.Bool("debug", false, "run in debug mode")
+	jwtExpiry     = flag.Int("jwt-expiry", DefaultJWTExpiry, "JWT expiry in minutes")
+	jwtSigningKey = flag.String("jwt-signing-key", "", "JWT signing key")
 )
 
 func main() {
@@ -93,7 +98,7 @@ func main() {
 
 		// TODO(dario) implement authentication
 
-		expireAt := time.Now().Add(5 * time.Minute).Unix()
+		expireAt := time.Now().Add(time.Duration(*jwtExpiry) * time.Minute).Unix()
 
 		claim := &claims{
 			Username: f.Data.Username,
