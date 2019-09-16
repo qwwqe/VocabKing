@@ -83,6 +83,13 @@ type SaveWordResponse struct {
 	Data   SaveWordResponseData `json:"data"`
 }
 
+func NewSaveWordResponse() SaveWordResponse {
+	return SaveWordResponse{
+		Result: ResultOK,
+		Data:   SaveWordResponseData{},
+	}
+}
+
 type SavePictureForm struct {
 	Data struct{} `json:"data" binding:"required"`
 }
@@ -93,4 +100,11 @@ type SavePictureResponseData struct {
 type SavePictureResponse struct {
 	Result string                  `json:"result"`
 	Data   SavePictureResponseData `json:"data"`
+}
+
+func NewSavePictureResponse() SavePictureResponse {
+	return SavePictureResponse{
+		Result: ResultOK,
+		Data:   SavePictureResponseData{},
+	}
 }
