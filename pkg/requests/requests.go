@@ -21,7 +21,13 @@ type LoginForm struct {
 	Data struct {
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
-	} `json:"data" binding:"required"`
+	} `json:"data"`
+}
+
+type RefreshForm struct {
+	Data struct {
+		Token string `json:"token" binding:"required"`
+	} `json:"data"`
 }
 
 type LoginResponseData struct {
@@ -31,7 +37,7 @@ type LoginResponseData struct {
 
 type LoginResponse struct {
 	Result string            `json:"result"`
-	Data   LoginResponseData `json:"data" binding:"required"`
+	Data   LoginResponseData `json:"data"`
 }
 
 func NewLoginResponse(expiry int64, token string) LoginResponse {
@@ -45,7 +51,8 @@ func NewLoginResponse(expiry int64, token string) LoginResponse {
 }
 
 type StatsForm struct {
-	Data struct{} `json:"data" binding:"required"`
+	Data struct {
+	} `json:"data"`
 }
 
 type StatsResponseData struct {
@@ -72,7 +79,8 @@ func NewStatsResponse() StatsResponse {
 }
 
 type SaveWordForm struct {
-	Data struct{} `json:"data" binding:"required"`
+	Data struct {
+	} `json:"data"`
 }
 
 type SaveWordResponseData struct {
@@ -91,7 +99,8 @@ func NewSaveWordResponse() SaveWordResponse {
 }
 
 type SavePictureForm struct {
-	Data struct{} `json:"data" binding:"required"`
+	Data struct {
+	} `json:"data"`
 }
 
 type SavePictureResponseData struct {
