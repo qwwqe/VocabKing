@@ -1,8 +1,13 @@
 # VocabKing API
 
-All requests **must include** the header `Accept: application/json`.
+| Header             | Required   | Description                                                                                  | Example                         |
+|--------------------|------------|----------------------------------------------------------------------------------------------|---------------------------------|
+| `Accept`           | Yes        | Explicitly indicate to the server that you want JSON format responses. Use example verbatim. | `Accept: application/json`      |
+| `Authorization`    | For `/api` | Bearer token for authenticated endpoints                                                     | `Authorization: Bearer abc.xyz` |
+| `X-Client-Name`    | No         | Name of the client used to communicate with the server                                       | `X-Client-Name: Android-App`    |
+| `X-Client-Version` | No         | Version of the client used to communicate with the server                                    | `X-Client-Version: v1.0.0`      |
 
-All request bodies **must be** JSON and should follow this basic structure:
+All request bodies **must be** in JSON format and **must follow** this basic structure:
 
 ``` json
 {
@@ -10,14 +15,6 @@ All request bodies **must be** JSON and should follow this basic structure:
     ...
   }
 }
-```
-
-All requests under `/api` **must include** a valid bearer token.
-
-Example:
-
-``` plain
-Authorization: Bearer TOKEN
 ```
 
 If the request is <span style="color: green">**successful**</span> the response will be:
@@ -48,8 +45,7 @@ If the request is <span style="color: red">**unsuccessful**</span> the response 
 }
 ```
 
-Note that it is not guaranteed that `data.ops` and `data.stack` will exist and
-may be excluded in non-debug operation.
+Note that it is not guaranteed that `data.ops` and `data.stack` will exist and may be excluded in non-debug operation.
 
 ## Endpoints
 
@@ -81,10 +77,10 @@ this endpoint.
 }
 ```
 
-| Key        | Type   | Description      |
-|------------|--------|------------------|
-| `username` | String | Account username |
-| `password` | String | Account password |
+| Key        | Required | Type   | Description      |
+|------------|----------|--------|------------------|
+| `username` | Yes      | String | Account username |
+| `password` | Yes      | String | Account password |
 
 **Response data:**
 
@@ -111,7 +107,7 @@ Use this endpoint to refresh an existing authentication token's expiry.
 
 Replace your token with the token given in the response data.
 
-Not that you may only refresh a token within **30 seconds** of its expiry.
+Note that you may only refresh a token within **30 seconds** of its expiry.
 HTTP Bad Request will be returned otherwise.
 
 **Request data:**
@@ -124,9 +120,9 @@ HTTP Bad Request will be returned otherwise.
 }
 ```
 
-| Key     | Type   | Description                          |
-|---------|--------|--------------------------------------|
-| `token` | String | Authentication token to be refreshed |
+| Key     | Required | Type   | Description                          |
+|---------|----------|--------|--------------------------------------|
+| `token` | Yes      | String | Authentication token to be refreshed |
 
 **Response data:**
 
