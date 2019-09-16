@@ -96,10 +96,10 @@ this endpoint.
 }
 ```
 
-| Key      | Type   | Description                  |
-|----------|--------|------------------------------|
-| `expiry` | Number | Token expiry in milliseconds |
-| `token`  | String | Authentication token         |
+| Key      | Type   | Description             |
+|----------|--------|-------------------------|
+| `expiry` | Number | Token expiry in seconds |
+| `token`  | String | Authentication token    |
 
 ### POST `/auth/refresh`
 
