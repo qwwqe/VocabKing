@@ -126,13 +126,41 @@ func main() {
 	api.POST("/word", func(c *gin.Context) {
 		const op errors.Op = "save.word"
 
-		c.Status(http.StatusOK)
+		meta := errors.Meta{
+			HeaderServerVersion: version,
+			HeaderClientName:    c.Request.Header.Get(HeaderClientName),
+			HeaderClientVersion: c.Request.Header.Get(HeaderClientVersion),
+		}
+
+		f := &requests.SaveWordForm{}
+
+		if err := c.ShouldBindJSON(f); err != nil {
+			err := errors.NilOrNew(op, errors.KindBadForm, err, meta)
+			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, requests.NewSaveWordResponse())
 	})
 
 	api.POST("/picture", func(c *gin.Context) {
 		const op errors.Op = "save.picture"
 
-		c.Status(http.StatusOK)
+		meta := errors.Meta{
+			HeaderServerVersion: version,
+			HeaderClientName:    c.Request.Header.Get(HeaderClientName),
+			HeaderClientVersion: c.Request.Header.Get(HeaderClientVersion),
+		}
+
+		f := &requests.SavePictureForm{}
+
+		if err := c.ShouldBindJSON(f); err != nil {
+			err := errors.NilOrNew(op, errors.KindBadForm, err, meta)
+			c.JSON(err.Kind().StatusCode(), requests.NewErrorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, requests.NewSavePictureResponse())
 	})
 
 	r.Run()
