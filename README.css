@@ -1,0 +1,45 @@
+html {
+  font-family: sans-serif;
+}
+
+body {
+  margin: 1em;
+}
+
+th {
+  text-align: left;
+  text-transform: uppercase;
+}
+
+th, td {
+  padding: 5px;
+}
+
+p {
+  line-height: 1.25em;
+}
+
+p, code {
+  font-size: 17px;
+}
+
+pre, code {
+  background: #EEEEFF;
+}
+
+pre {
+  padding: 1em;
+  overflow-x: auto;
+}
+
+h1, h2, h3, h4, h5 {
+  border-bottom: 1px dotted black;
+}
+
+table {
+  width: 100%;
+}
+
+img {
+  max-width: 100%;
+}

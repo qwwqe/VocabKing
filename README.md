@@ -7,7 +7,7 @@
 | `X-Client-Name`    | No         | Name of the client used to communicate with the server                                       | `X-Client-Name: Android-App`    |
 | `X-Client-Version` | No         | Version of the client used to communicate with the server                                    | `X-Client-Version: v1.0.0`      |
 
-All request bodies **must be** in JSON format and **must follow** this basic structure:
+All request bodies **must be** in JSON format and should follow this basic structure:
 
 ``` json
 {
@@ -16,6 +16,8 @@ All request bodies **must be** in JSON format and **must follow** this basic str
   }
 }
 ```
+
+`data` can be safely omitted if it is empty or has no required fields.
 
 If the request is <span style="color: green">**successful**</span> the response will be:
 
